@@ -1,16 +1,16 @@
 function Dot(x,y)
 {
-	this.x = this.dx = this.ax = x;
-	this.y = this.dy = this.ay = y;
-	
-	this.vx = 0;
-	this.vy = 0;
+	this.anchorPt = new Point2D(x,y)
+	this.currentPt = new Point2D(x,y)
 }//eoc
 
 
 
 
 Dot.List = [];
+Dot.Aim = null;
+Dot.Radius = 1;
+Dot.Dist = 50;
 
 
 
@@ -19,22 +19,13 @@ Dot.DrawAll = function()
 {
 	var ctx = Vars.Ctx;
 	ctx.beginPath();
-	ctx.fillStyle = "black";
 	
 	for(var i=0; i<Vars.GridRows; ++i)
 		for(var j=0; j<Vars.GridCols; ++j)
 			Dot.List[i][j].draw();
-		
+	
+	ctx.fillStyle = "black";
 	ctx.fill();
-}//eof
-
-
-
-Dot.AttractorChanged = function()
-{
-	for(var i=0; i<Vars.GridRows; ++i)
-		for(var j=0; j<Vars.GridCols; ++j)
-			Dot.List[i][j].attractorChanged();
 }//eof
 
 
@@ -42,6 +33,8 @@ Dot.AttractorChanged = function()
 
 Dot.Init = function()
 {
+	Dot.Aim = new Point2D(0,0);
+	
 	var w = Vars.PageW/Vars.GridCols;
 	var h = Vars.PageH/Vars.GridRows;
 	
@@ -62,57 +55,21 @@ Dot.Init = function()
 
 
 
-Dot.Radius = 4;
-
-
-
-
 Dot.prototype.draw = function()
 {
-	this.move()
+	this.move();
 	
 	var ctx = Vars.Ctx;
+	var x = this.currentPt.x;
+	var y = this.currentPt.y;
 	
-	ctx.fillRect(this.x-1, this.y-1, 2, 2);
+	ctx.moveTo(x+Dot.Radius, y);
+	ctx.arc(x, y, Dot.Radius, 0, 2*Math.PI);
 };//eof
 
 
 
 Dot.prototype.move = function()
 {
-	if(Math.abs(this.x-this.dx)<3 && Math.abs(this.y-this.dy)<3)
-	{
-		this.vx = 0;
-		this.vy = 0;
-	}
-	else
-	{
-		this.x += this.vx;
-		this.y += this.vy;
-	}
-}//eof
-
-
-
-
-Dot.prototype.attractorChanged = function()
-{
-	var tx = 0;
-	var ty = 0;
-	var c = 0;
-	
-	for(var i=0; i<Attractor.List.length; ++i)
-	{
-		var a = Attractor.List[i];
-		
-		tx += a.x;
-		ty += a.y;
-		c++
-	}
-	
-	this.dx = tx/c;
-	this.dy = ty/c;
-	
-	this.vx = (this.dx-this.x)/100;
-	this.vy = (this.dy-this.y)/100;
+	this.currentPt = this.anchorPt.pointAtDistInPointAxis(Dot.Dist, Dot.Aim);
 }//eof

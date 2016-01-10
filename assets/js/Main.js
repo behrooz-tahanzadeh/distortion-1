@@ -1,6 +1,6 @@
 Main = 
 {
-	intervalTime:50,
+	intervalTime:10,
 	intervalID:-1,
 	
 	
@@ -11,8 +11,8 @@ Main =
 	{
 		Vars.Init();
 		Dot.Init();
-		Attractor.Init();
 		
+		Vars.CJq.mousemove(this.CanvasOnMouseMove);
 		
 		jQuery("div#pp").click(Main.PP.bind(this));
 		
@@ -61,8 +61,13 @@ Main =
 	
 	Loop: function()
 	{
+		var ctx = Vars.Ctx;
+		
+		ctx.fillStyle = "rgba(255,255,255,"+this.BgOpacity+")";
+		ctx.fillRect(0, 0, Vars.PageW, Vars.PageH);
+		
 		Dot.DrawAll();
-		Attractor.DrawAll();
+		Connection.DrawAll();
 	},
 	
 	
@@ -81,6 +86,17 @@ Main =
 			this.intervalID = -1;
 			jQuery("div#pp").html('play');
 		}
+	},
+	
+	
+	
+	
+	CanvasOnMouseMove: function(e)
+	{
+		var x = e.pageX - jQuery(this).offset().left;
+		var y = e.pageY - jQuery(this).offset().top;
+		
+		Dot.Aim = new Point2D(x, y);
 	}
 };//eo Main{}
 
